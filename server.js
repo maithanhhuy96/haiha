@@ -93,7 +93,6 @@ server.post('/auth', (req, res) => {
         username,
         password
     } = req.body;
-    console.log(username, password);
     if (
 
         username === config.login_config.admin_usr &&

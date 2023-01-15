@@ -1,5 +1,6 @@
 flag = false
 var gauge1;
+var role = "";
 var overiew_data = [{
         "tankno": "1",
         "product": "Xăng RON92",
