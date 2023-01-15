@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebSocket Example</title>
+    <style>
+      /* Add some styling for the messages */
+      .message {
+        padding: 10px;
+        margin: 10px 0;
+        background-color: #f2f2f2;
+        border-radius: 5px;
+      }
+    </style>
+    <!-- import image  -->
+    
+  </head>
+  <body>
+    <h1>WebSocket Example</h1>
+    <img src="../images/core/tank.jpg" alt="">
+    <div id="messages"></div>
+    
+    <script>
+      // Connect to the WebSocket server
+      const ws = new WebSocket('ws://localhost:8080');
+      
+      ws.onopen = function() {
+        console.log('Connected to WebSocket server');
+      };
+      
+      ws.onmessage = function(event) {
+        // Get the messages container
+        const messages = document.getElementById('messages');
+        
+        // Create a new message element
+        const message = document.createElement('div');
+        message.className = 'message';
+        message.innerHTML = event.data;
+        
+        // Append the message to the container
+        messages.appendChild(message);
+      };
+      // get data from /data  when page is loaded
+      window.onload = function() {
+        fetch('/config')
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+          });
+      };
+      
+    </script>
+  </body>
+</html>

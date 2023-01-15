@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- <link rel="apple-touch-icon" sizes="76x76" href="../../assets/img/apple-icon.png"> -->
+  <!-- <link rel="icon" type="image/png" href="../../assets/img/favicon.png"> -->
+  <title>
+    Tank Monitor
+  </title>
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <!-- Nucleo Icons -->
+  <link href="../static/styles/nucleo-icons.css" rel="stylesheet" />
+  <link href="../static/styles/nucleo-svg.css" rel="stylesheet" />
+  <!-- add excel pakage -->
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <!-- bootbox -->
+  <!-- CSS Files -->
+  <!-- index.js -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="../static/js/bootstrap.min.js"></script>
+  <link id="pagestyle" href="../static/styles/material-dashboard.css?v=3.0.4" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+
+  <style>
+    /* set color for th table */
+    .table th {
+      color: #1976d2 !important;
+      
+    }
+    #modal-table th span{
+      color: #1976d2 !important;
+      
+    }
+    .liquip-level{
+      height: 100px;
+      width: 50px;
+      color: red;
+      /* position:absolute; */
+      /* top: 25%;
+      left: 50%; */
+    }
+    .edit-btn{
+      cursor: pointer;
+    }
+    .edit-btn:hover i{
+      color: #1576d0;
+    }
+    .border-bottom{
+      border-bottom: 1px solid #e9ecef;
+      border-radius: 0% !important;
+      width: 70%;
+      margin: 0 auto;
+    }
+    /* .border-bottom change color when focus */
+    .border-bottom:focus{
+      border-radius: 0% !important;
+      width: 70%;
+      margin: 0 auto;
+      /* color of border expand */
+      border-bottom: 1px solid #1576d0 !important;
+
+    }
+    
+  </style>
+  <script>
+    function editTank(obj){
+      let tr = obj.closest('tr');
+      let tankid = parseInt(tr.getAttribute('tankid'));
+      // get data from tr[0:6] and set to modal #tank-table-modal
+      let new_row = document.createElement('tr');
+      let new_col = document.createElement('td');
+      // class
+      new_col.setAttribute('class', 'text-center text-sm font-weight-bold');
+      new_col.innerHTML = tr.children[0].children[0].innerHTML;
+      new_row.appendChild(new_col);
+      // dropdown 
+      // Xăng RON92
+      // Xăng RON95
+      // Dầu DO 0.05S
+      // Xăng E5 RON92
+      new_col = document.createElement('td');
+      new_col.setAttribute('class', 'text-sm');
+      let new_select = document.createElement('select');
+      new_select.setAttribute('class', 'form-control text-center text-sm');
+      let new_option = document.createElement('option');
+      new_option.setAttribute('value', 'Xăng RON92');
+      new_option.innerHTML = 'Xăng RON92';
+      new_select.appendChild(new_option);
+      new_option = document.createElement('option');
+      new_option.setAttribute('value', 'Xăng RON95');
+      new_option.innerHTML = 'Xăng RON95';
+      new_select.appendChild(new_option);
+      new_option = document.createElement('option');
+      new_option.setAttribute('value', 'Dầu DO 0.05S');
+      new_option.innerHTML = 'Dầu DO 0.05S';
+      new_select.appendChild(new_option);
+      new_option = document.createElement('option');
+      new_option.setAttribute('value', 'Xăng E5 RON92');
+      new_option.innerHTML = 'Xăng E5 RON92';
+      new_select.appendChild(new_option);
+      new_col.appendChild(new_select);
+      new_row.appendChild(new_col);
+
+      // set value for select
+      let select = new_select;
+      let options = select.options;
+      for (let i = 0; i < options.length; i++) {
+        if (options[i].value == tr.children[1].children[0].innerHTML) {
+          select.selectedIndex = i;
+          break;
+        }
+      }
+      // input
+      new_col = document.createElement('td');
+      input = document.createElement('input');
+      input.setAttribute('type', 'text');
+      input.setAttribute('class', 'form-control text-center text-sm font-weight-bold border-bottom');
+      input.setAttribute('value', tr.children[2].children[0].innerText);
+      new_col.appendChild(input);
+      new_row.appendChild(new_col);
+      // input
+      new_col = document.createElement('td');
+      input = document.createElement('input');
+      input.setAttribute('type', 'text');
+      input.setAttribute('class', 'form-control text-center text-sm font-weight-bold border-bottom');
+      input.setAttribute('value', tr.children[3].children[0].innerText);
+      new_col.appendChild(input);
+      new_row.appendChild(new_col);
+      // input
+      new_col = document.createElement('td');
+      input = document.createElement('input');
+      input.setAttribute('type', 'text');
+      input.setAttribute('class', 'form-control text-center text-sm font-weight-bold border-bottom');
+      input.setAttribute('value', tr.children[4].children[0].innerText);
+      new_col.appendChild(input);
+      new_row.appendChild(new_col);
+      
+      // add tr to table
+      let body = document.getElementById('tank-table-modal');
+      body.innerHTML = '';
+      body.appendChild(new_row);
+
+      // open modal
+      $('#modal').modal('show');
+    }
+
+    function saveTank(){
+      // bootbox
+      // don't show x button
+      bootbox.confirm({
+        message: "Bạn có chắc muốn lưu thay đổi?",
+        closeButton: false, 
+        buttons: {
+          confirm: {
+            label: 'Có',
+            className: 'btn-success'
+          },
+          cancel: {
+            label: 'Không',
+            className: 'btn-danger'
+          }
+        },
+        callback: function (result) {
+          if(result){
+            // get data from modal
+            let table = document.getElementById('tank-table-modal');
+            let tr = table.children[0];
+            let tankid = parseInt(tr.children[0].innerHTML);
+            let product = tr.children[1].children[0].value;
+            let maxh = parseFloat(tr.children[2].children[0].value);
+            let maxv = parseFloat(tr.children[3].children[0].value);
+            let density = parseFloat(tr.children[4].children[0].value);
+            // send data to server
+            fetch('/configurations', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                tankid: tankid,
+                product: product,
+                maxh: maxh,
+                maxv: maxv,
+                density: density
+              })
+            })
+            .then(res => res.json())
+            .then(data => {
+              if(data.status == 'success'){
+                // update table
+                let table = document.getElementById('tank-table');
+                // get tr with data-tankid = tankid
+                let tr = table.querySelector(`tr[tankid="${tankid}"]`);
+                tr.children[1].children[0].innerHTML = product;
+                tr.children[2].children[0].innerHTML = maxh;
+                tr.children[3].children[0].innerHTML = maxv;
+                tr.children[4].children[0].innerHTML = density;
+                // close modal
+                $('#modal').modal('hide');
+              }
+            })
+          }
+        }
+      });
+    }
+  </script>
+</head>
+
+<body class="page-headers-sections" style="background-color: #f5f5f5;">
+  <!-- Navbar Light -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
+    <div class="container">
+      <a class="navbar-brand" rel="tooltip" title="Designed and Coded by Creative Tim" data-placement="bottom" target="_blank">
+        KHO XĂNG DẦU HẢI HÀ - QUẢNG TRỊ
+      </a>
+      <button class="navbar-toggler shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon mt-2">
+          <span class="navbar-toggler-bar bar1"></span>
+          <span class="navbar-toggler-bar bar2"></span>
+          <span class="navbar-toggler-bar bar3"></span>
+        </span>
+      </button>
+      <div class="collapse navbar-collapse w-100 pt-3 pb-2 py-lg-0 ps-lg-5" id="navigation">
+        <ul class="navbar-nav navbar-nav-hover ms-auto">
+          <li class="nav-item dropdown dropdown-hover mx-2 ms-lg-5">
+            <a class="nav-link ps-2 d-flex justify-content-between cursor-pointer align-items-center"  href="/">
+              <i class="material-icons opacity-6 me-2 text-md">dashboard</i>
+              Tank Farm Overview
+            </a>
+          </li>
+          <li class="nav-item dropdown dropdown-hover mx-2">
+            <a class="nav-link ps-2 d-flex justify-content-between cursor-pointer align-items-center" href="/history" >
+              <i class="material-icons opacity-6 me-2 text-md">history</i>
+              History
+            </a>
+          </li>
+          <li class="nav-item dropdown dropdown-hover mx-2">
+            <a class="nav-link ps-2 d-flex justify-content-between cursor-pointer align-items-center" href="/history" >
+              <i class="material-icons opacity-6 me-2 text-md">settings</i>
+              Configurations
+            </a>
+          </li>
+          <li class="nav-item dropdown dropdown-hover mx-2">
+            <a class="nav-link ps-2 d-flex justify-content-between cursor-pointer align-items-center" href="/logout" >
+              <i class="material-icons opacity-6 me-2 text-md">logout</i>
+              Log Out
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container-fluid py-4">
+    <div class="row justify-content-center">
+      <div class="col-xl-11">
+        <div class="card my-4">
+          <div class="card-body px-0 pb-2">
+            <div class="table-responsive p-0">
+              <!-- create the card and put tank filter and from date to date for show history from db -->
+              <table id="tanktable" class="table align-items-center mb-0 table-hover">
+                <thead>
+                  <tr>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      TANK NO.
+                      <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      PRODUCT
+                      <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      Max. Height
+                      <p class="text-xs text-secondary mb-0">mm</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      Max. Volume
+                      <p class="text-xs text-secondary mb-0">°C</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      DENSITY
+                      <p class="text-xs text-secondary mb-0">Kg/m3</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      Status
+                      <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                    </th>
+                    <th>
+                      <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="tank-table">
+                  <!-- use tankid, product, maxh, maxv, density in tank_data from flask -->
+                  {% for tank in tank_data %}
+                  <tr tankid="{{tank.tankid}}">
+                    <td class="text-center text-sm">
+                      <p class="text-secondary text-sm font-weight-bold mb-0">{{tank.tankid}}</p>
+                    </td>
+                    <td class="text-center text-sm">
+                      <p class="text-secondary text-sm font-weight-bold mb-0">{{tank.product}}</p>
+                    </td>
+                    <td class="text-center text-sm">
+                      <p class="text-secondary text-sm font-weight-bold mb-0">{{tank.maxh}}</p>
+                    </td>
+                    <td class="text-center text-sm">
+                      <p class="text-secondary text-sm font-weight-bold mb-0">{{tank.maxv}}</p>
+                    </td>
+                    <td class="text-center text-sm">
+                      <p class="text-secondary text-sm font-weight-bold mb-0">{{tank.density}}</p>
+                    </td>
+                    <td class="text-center text-sm">
+                      <span class="badge badge-sm bg-gradient-danger">Disconnected</span>
+                    </td>
+                    <td class="align-middle text-center text-sm">
+                      <a class="text-secondary font-weight-bold text-xs edit-btn" onclick="editTank(this)">
+                        <i class="material-icons opacity-6">edit</i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  <!-- <tr>
+                    <td colspan="9" class="text-center">No data</td>
+                  </tr> -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade bd-example-modal-lg" id="modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="max-width: 1000px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tankno">Edit Data</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-3">
+          <div class="col-md-12">
+            <table id="tanktable" class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                    TANK NO.
+                    <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                  </th>
+                  <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                    PRODUCT
+                    <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                  </th>
+                  <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                    Max. Height
+                    <p class="text-xs text-secondary mb-0">mm</p>
+                  </th>
+                  <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                    Max. Volume
+                    <p class="text-xs text-secondary mb-0">°C</p>
+                  </th>
+                  <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                    DENSITY
+                    <p class="text-xs text-secondary mb-0">Kg/m3</p>
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="tank-table-modal">
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" onclick="saveTank()">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- -------- END FOOTER 3 w/ COMPANY DESCRIPTION WITH LINKS & SOCIAL ICONS & COPYRIGHT ------- -->
+  <!--   Core JS Files   -->
+  <script src="../static/js/core/bootstrap.min.js" type="text/javascript"></script>
+  <!--  Google Maps Plugin    -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDTTfWur0PDbZWPr7Pmq8K3jiDp0_xUziI"></script>
+  <!-- <script src="../static/js/material-kit.min.js?v=3.0.4" type="text/javascript"></script> -->
+  <script>
+    if (document.getElementById('typed')) {
+      var typed = new Typed("#typed", {
+        stringsElement: '#typed-strings',
+        typeSpeed: 70,
+        backSpeed: 50,
+        backDelay: 200,
+        startDelay: 500,
+        loop: true
+      });
+    }
+  </script>
+</body>
+
+</html>

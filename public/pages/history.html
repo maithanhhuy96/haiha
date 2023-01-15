@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- <link rel="apple-touch-icon" sizes="76x76" href="../../assets/img/apple-icon.png"> -->
+  <!-- <link rel="icon" type="image/png" href="../../assets/img/favicon.png"> -->
+  <title>
+    Tank Monitor
+  </title>
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <!-- Nucleo Icons -->
+  <link href="../static/styles/nucleo-icons.css" rel="stylesheet" />
+  <link href="../static/styles/nucleo-svg.css" rel="stylesheet" />
+  <!-- add excel pakage -->
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <!-- CSS Files -->
+  <link id="pagestyle" href="../static/styles/material-dashboard.css?v=3.0.4" rel="stylesheet" />
+  <!-- for date picker -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+  <!-- index.js -->
+  <script src="../static/js/history.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="../static/js/bootstrap.min.js"></script>
+  <style>
+    /* set color for th table */
+    .table th {
+      color: #1976d2 !important;
+      
+    }
+    #modal-table th span{
+      color: #1976d2 !important;
+      
+    }
+    .liquip-level{
+      height: 100px;
+      width: 50px;
+      color: red;
+      /* position:absolute; */
+      /* top: 25%;
+      left: 50%; */
+    }
+  </style>
+  <script>
+    var role = {{ role|tojson }};
+  </script>
+</head>
+
+<body class="page-headers-sections" style="background-color: #f5f5f5;">
+  <!-- Navbar Light -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
+    <div class="container">
+      <a class="navbar-brand" rel="tooltip" title="Designed and Coded by Creative Tim" data-placement="bottom" target="_blank">
+        KHO XĂNG DẦU HẢI HÀ - QUẢNG TRỊ
+      </a>
+      <button class="navbar-toggler shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon mt-2">
+          <span class="navbar-toggler-bar bar1"></span>
+          <span class="navbar-toggler-bar bar2"></span>
+          <span class="navbar-toggler-bar bar3"></span>
+        </span>
+      </button>
+      <div class="collapse navbar-collapse w-100 pt-3 pb-2 py-lg-0 ps-lg-5" id="navigation">
+        <ul class="navbar-nav navbar-nav-hover ms-auto">
+          <li class="nav-item dropdown dropdown-hover mx-2 ms-lg-5">
+            <a class="nav-link ps-2 d-flex justify-content-between cursor-pointer align-items-center"  href="/">
+              <i class="material-icons opacity-6 me-2 text-md">dashboard</i>
+              Tank Farm Overview
+            </a>
+          </li>
+          <li class="nav-item dropdown dropdown-hover mx-2">
+            <a class="nav-link ps-2 d-flex justify-content-between cursor-pointer align-items-center" href="/history" >
+              <i class="material-icons opacity-6 me-2 text-md">history</i>
+              History
+            </a>
+          </li>
+          <li class="nav-item dropdown dropdown-hover mx-2" style="display:none;" id="configuration_feature">
+            <a class="nav-link ps-2 d-flex justify-content-between cursor-pointer align-items-center" href="/configurations" >
+              <i class="material-icons opacity-6 me-2 text-md">settings</i>
+              Configurations
+            </a>
+          </li>
+          <li class="nav-item dropdown dropdown-hover mx-2">
+            <a class="nav-link ps-2 d-flex justify-content-between cursor-pointer align-items-center" href="/logout" >
+              <i class="material-icons opacity-6 me-2 text-md">logout</i>
+              Log Out
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container-fluid py-4">
+    <div class="row justify-content-center">
+      <div class="col-xl-11">
+        <div class="card my-4">
+          <div class="card-body px-0 pb-2">
+            <div class="table-responsive p-0">
+              <!-- create the card and put tank filter and from date to date for show history from db -->
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="tank">Tank</label>
+                        <select class="form-control" id="tank">
+                          <option value="">--/--</option>
+                          {% for i in range(1, page_config.tank_number+1) %}
+                          <option value="{{i}}">Tank {{i}}</option>
+                          {% endfor %}
+                          
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="from">From Date</label>
+                        <!-- date and time -->
+                        <input type="datetime-local" class="form-control" id="tank_from_date" style="width:140px;">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="to">To Date</label>
+                        <!-- date and time -->
+                        <input type="datetime-local" class="form-control" id="tank_to_date" style="width:140px;">
+                      </div>
+                    </div>
+                    <!-- create button in middle -->
+                    <div class="col-md-1">
+                      <div class="form-group">
+                        <button type="button" onclick="get_tank_data()" class="btn" id="search" style="background-color: #1976d2; color: #fff;">View</button>
+                      </div>
+                    </div>
+                    <div class="col-md-1">
+                      <div class="form-group">
+                        <button type="button" onclick="export_tank_data()" class="btn" id="export_tank" style="background-color: #229424; color: #fff;">Dowload</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </br>
+
+              <table id="tanktable" class="table align-items-center mb-0 table-hover">
+                <thead>
+                  <tr>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      Date Time
+                      <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      TANK NO.
+                      <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      PRODUCT
+                      <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      LEVEL
+                      <p class="text-xs text-secondary mb-0">mm</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      AVG. TEMP.
+                      <p class="text-xs text-secondary mb-0">°C</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      DENSITY
+                      <p class="text-xs text-secondary mb-0">Kg/m3</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      VCF
+                      <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      Gross Volume
+                      <p class="text-xs text-secondary mb-0">m3</p>
+                    </th>
+                    
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      Net Volume
+                      <p class="text-xs text-secondary mb-0">m3</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      MASS
+                      <p class="text-xs text-secondary mb-0">TONS</p>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="tank-table">
+                  <!-- create table for show history from db -->
+                  <!-- create empty  -->
+                  <tr>
+                    <td colspan="9" class="text-center">No data</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-xl-11">
+        <div class="card my-4">
+          <div class="card-body px-0 pb-2">
+            <div class="table-responsive p-0">
+              <!-- create the card and put tank filter and from date to date for show history from db -->
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="tank">Product</label>
+                        <select class="form-control" id="product">
+                          <option value="0">Xăng RON92</option>
+                          <option value="1">Xăng RON95</option>
+                          <option value="2">Dầu DO 0.05S</option>
+                          <option value="3">Xăng E5 RON92</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="from">From Date</label>
+                        <!-- date and time -->
+                        <input type="datetime-local" class="form-control" id="product_from_date" style="width:140px;">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="to">To Date</label>
+                        <!-- date and time -->
+                        <input type="datetime-local" class="form-control" id="product_to_date" style="width:140px;">
+                      </div>
+                    </div>
+                    <!-- create button in middle -->
+                    <div class="col-md-1">
+                      <div class="form-group">
+                        <button type="button" onclick="get_product_data()" class="btn" id="search" style="background-color: #1976d2; color: #fff;">View</button>
+                      </div>
+                    </div>
+                    <div class="col-md-1">
+                      <div class="form-group">
+                        <button type="button" onclick="export_product_data()" class="btn" id="export_product" style="background-color: #229424; color: #fff; ">Dowload</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </br>
+              <table id="producttable" class="table align-items-center mb-0 table-hover">
+                <thead>
+                  <tr>
+                    <th class=" text-secondary text-xxs font-weight-bolder" style="padding-top: 0;">Date Time
+                      <p class="text-xs text-secondary mb-0">&nbsp;</p>
+
+                    </th>
+                    <th class="text-center text-secondary text-xxs font-weight-bolder" style="padding-top: 0;">Product
+                      <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                    </th>
+                    <th class="text-center text-secondary text-xxs font-weight-bolder" style="padding-top: 0;">
+                      Total Gross Volume
+                      <p class="text-xs text-secondary mb-0">m3</p>
+
+                    </th>
+                    <th class="text-center text-secondary text-xxs font-weight-bolder" style="padding-top: 0;">
+                      Total Net Volume
+                      <p class="text-xs text-secondary mb-0">m3</p>
+
+                    </th>
+                    <th class="text-center text-secondary text-xxs font-weight-bolder" style="padding-top: 0;">
+                      Total MASS
+                      <p class="text-xs text-secondary mb-0">TONS</p>
+
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="product-table">
+                  <!-- create table for show history from db -->
+                  <!-- create empty  -->
+                  <tr>
+                    <td colspan="5" class="text-center">No data</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade bd-example-modal-lg" id="modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="max-width: 1200px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tankno">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-7">
+              <!-- create dropdow with option Xăng RON92, Xăng RON95, Dầu DO 0.05S, Xăng E5 RON92 -->
+              <!-- set middle -->
+              <div class="form-group" id="tank_image" style="background-image: url('../static/images/core/tank.png');background-size: contain; height: 100%;background-repeat:no-repeat;">
+                <div id="level_image" style="background-color: #fff; position: relative; top: 60%; left: 65%; transform: translate(-50%, -50%);">
+                  <div style="color: #3d15e4; position: relative; top: 0; left: 0; width: 100%; height: 50%;z-index: 0; text-align: center;">0.000</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <table class="table align-items-center mb-0" id="modal-table">
+                <tr>
+                  <th class="text-center text-secondary text-xxs font-weight-bolder">
+                    <span class="text-secondary text-sm font-weight-bold">Max. Hight[mm]</span>
+                  </th>
+                  <td class="align-middle text-center text-sm">
+                    <span id="maxhight" class="text-secondary text-sm font-weight-bold">xxx</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-center text-secondary text-xxs font-weight-bolder">
+                    <span  class="text-secondary text-sm font-weight-bold">Max.Volume[m3]</span>
+                  </th>
+                  <td class="align-middle text-center text-sm">
+                    <span id="maxvolume" class="text-secondary text-sm font-weight-bold">xxx</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-center text-secondary text-xxs font-weight-bolder">
+                    <span  class="text-secondary text-sm font-weight-bold">Product</span>
+                  </th>
+                  <td class="align-middle text-center text-sm">
+                    <span id="product" class="text-secondary text-sm font-weight-bold">xxx</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-center text-secondary text-xxs font-weight-bolder">
+                    <span class="text-secondary text-sm font-weight-bold">Level[mm]</span>
+                  </th>
+                  <td class="align-middle text-center text-sm">
+                    <span id="level" class="text-secondary text-sm font-weight-bold">xxx</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-center text-secondary text-xxs font-weight-bolder">
+                    <span class="text-secondary text-sm font-weight-bold">Avg. Temp[oC]</span>
+                  </th>
+                  <td class="align-middle text-center text-sm">
+                    <span id="avgtemp" class="text-secondary text-sm font-weight-bold">xxx</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-center text-secondary text-xxs font-weight-bolder">
+                    <span class="text-secondary text-sm font-weight-bold">Density</span>
+                  </th>
+                  <td class="align-middle text-center text-sm">
+                    <span id="density" class="text-secondary text-sm font-weight-bold">xxx</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-center text-secondary text-xxs font-weight-bolder">
+                    <span class="text-secondary text-sm font-weight-bold">VCF</span>
+                  </th>
+                  <td class="align-middle text-center text-sm">
+                    <span  id="vcf" class="text-secondary text-sm font-weight-bold">xxx</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-center text-secondary text-xxs font-weight-bolder">
+                    <span class="text-secondary text-sm font-weight-bold">Gross Volume[m3]</span>
+                  </th>
+                  <td class="align-middle text-center text-sm">
+                    <span id="grossvolume" class="text-secondary text-sm font-weight-bold">xxx</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-center text-secondary text-xxs font-weight-bolder">
+                    <span class="text-secondary text-sm font-weight-bold">Net Volume[m3]</span>
+                  </th>
+                  <td class="align-middle text-center text-sm">
+                    <span id="netvolume" class="text-secondary text-sm font-weight-bold">xxx</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-center text-secondary text-xxs font-weight-bolder">
+                    <span class="text-secondary text-sm font-weight-bold">Mass[tons]</span>
+                  </th>
+                  <td class="align-middle text-center text-sm">
+                    <span id="mass" class="text-secondary text-sm font-weight-bold">xxx</span>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- -------- END FOOTER 3 w/ COMPANY DESCRIPTION WITH LINKS & SOCIAL ICONS & COPYRIGHT ------- -->
+  <!--   Core JS Files   -->
+  <script src="../static/js/core/bootstrap.min.js" type="text/javascript"></script>
+  <!--  Google Maps Plugin    -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDTTfWur0PDbZWPr7Pmq8K3jiDp0_xUziI"></script>
+  <script src="../static/js/material-kit.min.js?v=3.0.4" type="text/javascript"></script>
+  <script>
+    if (document.getElementById('typed')) {
+      var typed = new Typed("#typed", {
+        stringsElement: '#typed-strings',
+        typeSpeed: 70,
+        backSpeed: 50,
+        backDelay: 200,
+        startDelay: 500,
+        loop: true
+      });
+    }
+  </script>
+</body>
+
+</html>
