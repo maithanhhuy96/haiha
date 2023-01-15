@@ -209,7 +209,8 @@ ws.onopen = function () {
 };
 
 ws.onmessage = function (event) {
-    overiew_data = event.data.tankdata;
+    const temp = JSON.parse(event.data);
+    overiew_data = temp.tankdata;
     // update data
     update_data_table();
     // update table

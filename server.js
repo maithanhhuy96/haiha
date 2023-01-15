@@ -55,10 +55,9 @@ mqtt_client.on('disconnect', () => {
 // recieve message and send to ws
 mqtt_client.on('message', (topic, message) => {
     console.log('MQTT message received');
-    console.log(message.toString());
     wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
-            client.send(message["tank_data"].toString());
+            client.send(message.toString());
         }
     });
 });
