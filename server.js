@@ -5,7 +5,7 @@ const path = require('path');
 const mqtt = require('mqtt');
 const WebSocket = require('ws');
 const bodyParser = require('body-parser');
-const sql = require('mssql')
+const sql = require('mssql/msnodesqlv8');
 const moment = require('moment');
 const config = require('./config');
 const server = express();
@@ -22,10 +22,10 @@ const port = 4000;
 
 // sql config
 const sql_config = {
-    server_name: 'HHQT-TAS\\SQLEXPRESS',
+    server: 'HHQT-TAS\\SQLEXPRESS',
     user: 'sa',
     password: 'sa2022',
-    database: 'datahis'
+    driver: 'msnodesqlv8',
 }
 const sql_table = {
     table_tank: 'tabletankhis',
@@ -65,7 +65,7 @@ mqtt_client.on('message', (topic, message) => {
 
 // ws config
 const wss = new WebSocket.Server({
-    port: 8080
+    port: 8081
 });
 wss.on('connection', (ws) => {
     console.log('WebSocket client connected');
@@ -166,8 +166,10 @@ server.get('/config', checkLogin, (req, res) => {
 server.post('/get_max', checkLogin, (req, res) => {
     // assign tankid from "tankno" in request
     const tankid = req.body.tankno;
-    // get data "SELECT maxh, maxv FROM tankdata WHERE tankid = " + tankid
-    sql.connect(sql_config, (err) => {
+    sql.connect({
+        ...sql_config,
+        database: 'quangtriconfig'
+    }, (err) => {
         if (err) {
             console.log(err);
         }
@@ -198,7 +200,10 @@ server.post("/tank_history", checkLogin, (req, res) => {
         to_date
     } = req.body;
     console.log(tankno, from_date, to_date);
-    sql.connect(sql_config, (err) => {
+    sql.connect({
+        ...sql_config,
+        database: config.sql_config.database
+    }, (err) => {
         if (err) {
             console.log(err);
         }
@@ -232,7 +237,10 @@ server.post('/product_history', checkLogin, (req, res) => {
         to_date
     } = req.body;
     console.log(idproduct, from_date, to_date);
-    sql.connect(sql_config, (err) => {
+    sql.connect({
+        ...sql_config,
+        database: config.sql_config.database
+    }, (err) => {
         if (err) {
             console.log(err);
         }
@@ -260,7 +268,10 @@ server.get('/configurations', checkLogin, (req, res) => {
 });
 
 server.get('/configurations/get', checkLogin, (req, res) => {
-    sql.connect(sql_config, (err) => {
+    sql.connect({
+        ...sql_config,
+        database: 'quangtriconfig'
+    }, (err) => {
         if (err) {
             console.log(err);
         }
@@ -288,7 +299,10 @@ server.get('/configurations/get', checkLogin, (req, res) => {
 server.post('/configurations/update', checkLogin, (req, res) => {
     const data = req.body;
     console.log(data);
-    sql.connect(sql_config, (err) => {
+    sql.connect({
+        ...sql_config,
+        database: 'quangtriconfig'
+    }, (err) => {
         if (err) {
             console.log(err);
         }

@@ -201,7 +201,7 @@ function view_detail(row_index) {
 }
 
 // Connect to the WebSocket server
-const server_address = 'ws://' + document.domain + ':' + '8080';
+const server_address = 'ws://' + document.domain + ':' + '8081';
 const ws = new WebSocket(server_address);
 
 ws.onopen = function () {
