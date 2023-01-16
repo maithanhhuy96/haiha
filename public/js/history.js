@@ -10,6 +10,30 @@ function get_tank_data() {
     console.log("tank_to_date: " + tank_to_date);
     // check if 3 values are not empty
     if (tank != "" && tank_from_date != "" && tank_to_date != "") {
+        var table_body = document.getElementById("tank-table");
+        table_body.innerHTML = "";
+        // add loading
+        // <tr>
+        //     <td colspan="5" style="text-align: center;">
+        //         <?xml version="1.0" encoding="utf-8"?>
+        //         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; background: none; display: block; shape-rendering: auto;" width="48px" height="48px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+        //         <circle cx="50" cy="50" r="32" stroke-width="8" stroke="#85a2b6" stroke-dasharray="50.26548245743669 50.26548245743669" fill="none" stroke-linecap="round">
+        //         <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" keyTimes="0;1" values="0 50 50;360 50 50"></animateTransform>
+        //         </circle>
+        //         </svg>
+        //     </td>
+        // </tr>
+        var loading = document.createElement("tr");
+        loading.innerHTML =
+            `td colspan="10" style="text-align: center;">
+                <?xml version="1.0" encoding="utf-8"?>
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; background: none; display: block; shape-rendering: auto;" width="48px" height="48px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                <circle cx="50" cy="50" r="32" stroke-width="8" stroke="#85a2b6" stroke-dasharray="50.26548245743669 50.26548245743669" fill="none" stroke-linecap="round">
+                <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" keyTimes="0;1" values="0 50 50;360 50 50"></animateTransform>
+                </circle>
+                </svg>
+            </td>`;
+        table_body.appendChild(loading);
 
         // fetch
         fetch("/tank_history", {
@@ -27,9 +51,8 @@ function get_tank_data() {
             .then(data => {
                 console.log(data);
                 data = data.data;
-                // update table-body: #tank-table
-                var table_body = document.getElementById("tank-table");
                 table_body.innerHTML = "";
+                // update table-body: #tank-table
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
                     var row_html = "<tr>";
@@ -64,6 +87,20 @@ function get_product_data() {
     console.log("product_to_date: " + product_to_date);
     // check if 3 values are not empty
     if (product != "" && product_from_date != "" && product_to_date != "") {
+        var table_body = document.getElementById("product-table");
+        table_body.innerHTML = "";
+        // create loading
+        var loading = document.createElement("tr");
+        loading.innerHTML =
+            `td colspan="5" style="text-align: center;">
+                <?xml version="1.0" encoding="utf-8"?>
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; background: none; display: block; shape-rendering: auto;" width="48px" height="48px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                <circle cx="50" cy="50" r="32" stroke-width="8" stroke="#85a2b6" stroke-dasharray="50.26548245743669 50.26548245743669" fill="none" stroke-linecap="round">
+                <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" keyTimes="0;1" values="0 50 50;360 50 50"></animateTransform>
+                </circle>
+                </svg>
+            </td>`;
+        table_body.appendChild(loading);
 
         // fetch
         fetch("/product_history", {
@@ -79,8 +116,6 @@ function get_product_data() {
             })
             .then(response => response.json())
             .then(data => {
-                // update table-body: #product-table
-                var table_body = document.getElementById("product-table");
                 table_body.innerHTML = "";
                 data = data.data;
                 for (var i = 0; i < data.length; i++) {

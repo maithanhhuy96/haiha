@@ -51,9 +51,6 @@
       left: 50%; */
     }
   </style>
-  <script>
-    var role = {{ role|tojson }};
-  </script>
 </head>
 
 <body class="page-headers-sections" style="background-color: #f5f5f5;">
@@ -195,8 +192,6 @@
                   </tr>
                 </thead>
                 <tbody id="tank-table">
-                  <!-- create table for show history from db -->
-                  <!-- create empty  -->
                   <tr>
                     <td colspan="9" class="text-center">No data</td>
                   </tr>
@@ -415,7 +410,7 @@
   <script src="../js/core/bootstrap.min.js" type="text/javascript"></script>
   <!--  Google Maps Plugin    -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDTTfWur0PDbZWPr7Pmq8K3jiDp0_xUziI"></script>
-  <script src="../js/material-kit.min.js?v=3.0.4" type="text/javascript"></script>
+  <!-- <script src="../js/material-kit.min.js?v=3.0.4" type="text/javascript"></script> -->
   <script>
     if (document.getElementById('typed')) {
       var typed = new Typed("#typed", {

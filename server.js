@@ -212,6 +212,7 @@ server.post("/tank_history", checkLogin, (req, res) => {
             if (err) {
                 console.log(err);
             }
+            console.log(result);
             // format "storedate" to "YYYY-MM-DD HH:mm:ss"
             for (i = 0; i < result.recordset.length; i++) {
                 result.recordset[i].storedate = moment(result.recordset[i].storedate).format('YYYY-MM-DD HH:mm:ss');
@@ -317,6 +318,9 @@ server.post('/configurations/update', checkLogin, (req, res) => {
                 console.log(err);
             }
             console.log(result);
+            res.send({
+                'status': 'success',
+            });
         });
 
     });
