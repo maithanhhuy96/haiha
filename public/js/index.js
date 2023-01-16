@@ -8,6 +8,7 @@ var overiew_data = [{
         "avgtemp": "22.1",
         "density": "0.1",
         "vcf": "0.3",
+        "wcf": "0.3",
         "grossvolume": "123.4256",
         "netvolume": "123.4253",
         "mass": "124",
@@ -19,6 +20,7 @@ var overiew_data = [{
         "avgtemp": "22.1",
         "density": "0.1",
         "vcf": "0.3",
+        "wcf": "0.3",
         "grossvolume": "123.4256",
         "netvolume": "123.4253",
         "mass": "124",
@@ -30,6 +32,7 @@ var overiew_data = [{
         "avgtemp": "22.1",
         "density": "0.1",
         "vcf": "0.3",
+        "wcf": "0.3",
         "grossvolume": "123.4256",
         "netvolume": "123.4253",
         "mass": "124",
@@ -41,6 +44,7 @@ var overiew_data = [{
         "avgtemp": "22.1",
         "density": "0.1",
         "vcf": "0.3",
+        "wcf": "0.3",
         "grossvolume": "123.4256",
         "netvolume": "123.4253",
         "mass": "124",
@@ -52,6 +56,7 @@ var overiew_data = [{
         "avgtemp": "22.1",
         "density": "0.1",
         "vcf": "0.3",
+        "wcf": "0.3",
         "grossvolume": "123.4256",
         "netvolume": "123.4253",
         "mass": "124",
@@ -98,16 +103,20 @@ function update_data_table() {
         vcf.className = "align-middle text-center text-end text-sm";
         // 1 decimal place
         vcf.innerHTML = '<td class="align-middle text-end text-sm"><span class="text-secondary text-sm font-weight-bold">' + parseFloat(overiew_data[i].vcf).toFixed(4) + '</span></td>';
+        var wcf = row.insertCell(6);
+        wcf.className = "align-middle text-center text-end text-sm";
+        // 1 decimal place
+        wcf.innerHTML = '<td class="align-middle text-end text-sm"><span class="text-secondary text-sm font-weight-bold">' + parseFloat(overiew_data[i].wcf).toFixed(4) + '</span></td>';
 
-        var grossvolume = row.insertCell(6);
+        var grossvolume = row.insertCell(7);
         grossvolume.className = "align-middle text-center text-end text-sm";
         // 3 decimal places
         grossvolume.innerHTML = '<td class="align-middle text-end text-sm"><span class="text-secondary text-sm font-weight-bold">' + parseFloat(overiew_data[i].grossvolume).toFixed(3) + '</span></td>';
-        var netvolume = row.insertCell(7);
+        var netvolume = row.insertCell(8);
         netvolume.className = "align-middle text-center text-end text-sm";
         // 3 decimal places
         netvolume.innerHTML = '<td class="align-middle text-end text-sm"><span class="text-secondary text-sm font-weight-bold">' + parseFloat(overiew_data[i].netvolume).toFixed(3) + '</span></td>';
-        var mass = row.insertCell(8);
+        var mass = row.insertCell(9);
         mass.className = "align-middle text-center text-end text-sm";
         // 3 decimal places
         mass.innerHTML = '<td class="align-middle text-end text-sm"><span class="text-secondary text-sm font-weight-bold">' + parseFloat(overiew_data[i].mass).toFixed(3) + '</span></td>';
@@ -141,6 +150,7 @@ function view_detail(row_index) {
     console.log(row_index);
     if (flag == false) {
         setTimeout(function () {
+
             var config1 = liquidFillGaugeDefaultSettings();
             config1.circleColor = "#FF7777";
             config1.textColor = "#FF4444";
@@ -182,6 +192,8 @@ function view_detail(row_index) {
             density.innerHTML = overiew_data[row_index - 1].density;
             var vcf = document.getElementById("vcf");
             vcf.innerHTML = overiew_data[row_index - 1].vcf;
+            var wcf = document.getElementById("wcf");
+            wcf.innerHTML = overiew_data[row_index - 1].wcf;
             var grossvolume = document.getElementById("grossvolume");
             grossvolume.innerHTML = overiew_data[row_index - 1].grossvolume;
             var netvolume = document.getElementById("netvolume");
@@ -259,5 +271,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (role == "admin") {
         document.getElementById("configuration_feature").style.display = "block";
     }
+});
+
+// when page load
+document.addEventListener('DOMContentLoaded', () => {
     gauge1 = loadLiquidFillGauge("fillgauge1", 0);
+    fetch("/config", {
+            method: "GET",
+        })
+        .then(response => response.json())
+        .then(data => {
+            let config = data.data;
+            var role = config.role || "";
+            if (role == "admin") {
+                document.getElementById("configuration_feature").style.display = "block";
+            }
+            document.getElementById("page-title").innerHTML = config.page_settings.title;
+        })
+
 });

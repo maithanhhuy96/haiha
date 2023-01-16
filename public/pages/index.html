@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <!-- <link rel="apple-touch-icon" sizes="76x76" href="../../assets/img/apple-icon.png"> -->
   <!-- <link rel="icon" type="image/png" href="../../assets/img/favicon.png"> -->
-  <title>
+  <title id="page-title">
     Tank Monitor
   </title>
   <!--     Fonts and icons     -->
@@ -144,6 +144,10 @@
                       <p class="text-xs text-secondary mb-0">&nbsp;</p>
                     </th>
                     <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
+                      WCF
+                      <p class="text-xs text-secondary mb-0">&nbsp;</p>
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xs-custom font-weight-bolder" style="padding-top: 0;">
                       Gross Volume
                       <p class="text-xs text-secondary mb-0">m3</p>
                     </th>
@@ -189,7 +193,7 @@
                 <div id="total-gross-volume" style="flex: 0 0 auto;
                 width: 19%; margin-left: auto; padding-top: 20px" class="align-middle text-center text-sm font-weight-bolder total-value">0.000</div>
                 <div id="total-net-volume" style="flex: 0 0 auto;
-                width: 10%; padding-top: 20px" class="align-middle text-center text-sm font-weight-bolder total-value">0.000</div>
+                width: 8%; padding-top: 20px" class="align-middle text-center text-sm font-weight-bolder total-value">0.000</div>
                 <div id="total-mass" style="flex: 0 0 auto;
                 width: 11%; padding-top: 20px" class="align-middle text-center text-sm font-weight-bolder total-value">0.000</div>
               </div>
@@ -217,7 +221,7 @@
                 <!-- <div id="level_image" style="background-color: #fff; position: relative; top: 60%; left: 65%; transform: translate(-50%, -50%);">
                   <div style="color: #3d15e4; position: relative; top: 0; left: 0; width: 100%; height: 50%;z-index: 0; text-align: center;">0.000</div>
                 </div> -->
-                <svg id="fillgauge1" width="97%" height="250" style="margin-top: 110px; margin-left:280px; width:170px" onclick="gauge1.update(NewValue());"></svg>
+                <svg id="fillgauge1" width="97%" height="250" style="margin-top: 110px; margin-left:280; width:170;" onclick="gauge1.update(NewValue());"></svg>
 
               </div>
             </div>
@@ -281,6 +285,14 @@
                 </tr>
                 <tr>
                   <th class="text-center text-secondary text-xxs font-weight-bolder">
+                    <span class="text-secondary text-sm font-weight-bold">WCF</span>
+                  </th>
+                  <td class="align-middle text-center text-sm">
+                    <span  id="wcf" class="text-secondary text-sm font-weight-bold">xxx</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-center text-secondary text-xxs font-weight-bolder">
                     <span class="text-secondary text-sm font-weight-bold">Gross Volume[m3]</span>
                   </th>
                   <td class="align-middle text-center text-sm">
@@ -320,7 +332,7 @@
   <script src="../js/core/bootstrap.min.js" type="text/javascript"></script>
   <!--  Google Maps Plugin    -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDTTfWur0PDbZWPr7Pmq8K3jiDp0_xUziI"></script>
-  <script src="../js/material-kit.min.js?v=3.0.4" type="text/javascript"></script>
+  <!-- <script src="../js/material-kit.min.js?v=3.0.4" type="text/javascript"></script> -->
   <script>
     if (document.getElementById('typed')) {
       var typed = new Typed("#typed", {

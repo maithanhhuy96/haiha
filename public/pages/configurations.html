@@ -212,6 +212,96 @@
         }
       });
     }
+    // 
+    document.addEventListener('DOMContentLoaded', () => {
+    gauge1 = loadLiquidFillGauge("fillgauge1", 0);
+    fetch("/config", {
+            method: "GET",
+        })
+        .then(response => response.json())
+        .then(data => {
+            let config = data.data;
+            var role = config.role || "";
+            if (role == "admin") {
+                document.getElementById("configuration_feature").style.display = "block";
+            }
+        })
+    fetch("/configurations/get", {
+            method: "GET",
+        })
+        .then(response => response.json())
+        .then(data => {
+            let tank_data = data.data;
+            // get tank table body 
+            let table = document.getElementById('tank-table');
+            for(let i = 0; i < tank_data.length; i++){
+              let tank = tank_data[i];
+              let tr = document.createElement('tr');
+              tr.setAttribute('tankid', tank.tankid);
+              // tankid
+              let td = document.createElement('td');
+              td.setAttribute('class', 'text-center text-sm');
+              let p = document.createElement('p');
+              p.setAttribute('class', 'text-secondary text-sm font-weight-bold mb-0');
+              p.innerHTML = tank.tankid;
+              td.appendChild(p);
+              tr.appendChild(td);
+              // product
+              td = document.createElement('td');
+              td.setAttribute('class', 'text-center text-sm');
+              p = document.createElement('p');
+              p.setAttribute('class', 'text-secondary text-sm font-weight-bold mb-0');
+              p.innerHTML = tank.product;
+              td.appendChild(p);
+              tr.appendChild(td);
+              // maxh
+              td = document.createElement('td');
+              td.setAttribute('class', 'text-center text-sm');
+              p = document.createElement('p');
+              p.setAttribute('class', 'text-secondary text-sm font-weight-bold mb-0');
+              p.innerHTML = tank.maxh;
+              td.appendChild(p);
+              tr.appendChild(td);
+              // maxv
+              td = document.createElement('td');
+              td.setAttribute('class', 'text-center text-sm');
+              p = document.createElement('p');
+              p.setAttribute('class', 'text-secondary text-sm font-weight-bold mb-0');
+              p.innerHTML = tank.maxv;
+              td.appendChild(p);
+              tr.appendChild(td);
+              // density
+              td = document.createElement('td');
+              td.setAttribute('class', 'text-center text-sm');
+              p = document.createElement('p');
+              p.setAttribute('class', 'text-secondary text-sm font-weight-bold mb-0');
+              p.innerHTML = tank.density;
+              td.appendChild(p);
+              tr.appendChild(td);
+              // status
+              td = document.createElement('td');
+              td.setAttribute('class', 'text-center text-sm');
+              let span = document.createElement('span');
+              span.setAttribute('class', 'badge badge-sm bg-gradient-danger');
+              span.innerHTML = 'Disconnected';
+              td.appendChild(span);
+              tr.appendChild(td);
+              // edit button
+              td = document.createElement('td');
+              td.setAttribute('class', 'align-middle text-center text-sm');
+              let a = document.createElement('a');
+              a.setAttribute('class', 'text-secondary font-weight-bold text-xs edit-btn');
+              a.setAttribute('onclick', 'editTank(this)');
+              let i = document.createElement('i');
+              i.setAttribute('class', 'material-icons opacity-6');
+              i.innerHTML = 'edit';
+              a.appendChild(i);
+              td.appendChild(a);
+              tr.appendChild(td);
+              table.appendChild(tr);
+            }
+        })
+});
   </script>
 </head>
 
@@ -299,37 +389,6 @@
                   </tr>
                 </thead>
                 <tbody id="tank-table">
-                  <!-- use tankid, product, maxh, maxv, density in tank_data from flask -->
-                  {% for tank in tank_data %}
-                  <tr tankid="{{tank.tankid}}">
-                    <td class="text-center text-sm">
-                      <p class="text-secondary text-sm font-weight-bold mb-0">{{tank.tankid}}</p>
-                    </td>
-                    <td class="text-center text-sm">
-                      <p class="text-secondary text-sm font-weight-bold mb-0">{{tank.product}}</p>
-                    </td>
-                    <td class="text-center text-sm">
-                      <p class="text-secondary text-sm font-weight-bold mb-0">{{tank.maxh}}</p>
-                    </td>
-                    <td class="text-center text-sm">
-                      <p class="text-secondary text-sm font-weight-bold mb-0">{{tank.maxv}}</p>
-                    </td>
-                    <td class="text-center text-sm">
-                      <p class="text-secondary text-sm font-weight-bold mb-0">{{tank.density}}</p>
-                    </td>
-                    <td class="text-center text-sm">
-                      <span class="badge badge-sm bg-gradient-danger">Disconnected</span>
-                    </td>
-                    <td class="align-middle text-center text-sm">
-                      <a class="text-secondary font-weight-bold text-xs edit-btn" onclick="editTank(this)">
-                        <i class="material-icons opacity-6">edit</i>
-                      </a>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                  <!-- <tr>
-                    <td colspan="9" class="text-center">No data</td>
-                  </tr> -->
                 </tbody>
               </table>
             </div>

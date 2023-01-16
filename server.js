@@ -18,7 +18,7 @@ server.use(session({
 server.use(bodyParser.json());
 
 // server config
-const port = 4000;
+const port = 5000;
 
 // sql config
 const sql_config = {
@@ -54,7 +54,6 @@ mqtt_client.on('disconnect', () => {
 
 // recieve message and send to ws
 mqtt_client.on('message', (topic, message) => {
-    console.log('MQTT message received');
     wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
             client.send(message.toString());
@@ -148,7 +147,6 @@ function checkLogin(req, res, next) {
 // index
 server.get('/', checkLogin, (req, res) => {
     res.sendFile(path.join(publicPath, 'pages', 'index.html'));
-    console.log(req.session.role);
 
 });
 
@@ -156,7 +154,12 @@ server.get('/', checkLogin, (req, res) => {
 server.get('/config', checkLogin, (req, res) => {
     data = {
         'status': 200,
-        'data': config.page_settings
+        // config.page_settings and config.history_settings
+        'data': {
+            'page_settings': config.page_settings,
+            'history_settings': config.history_settings,
+            'role': req.session.role
+        }
     }
     res.send(data);
 });
@@ -177,7 +180,6 @@ server.post('/get_max', checkLogin, (req, res) => {
             if (err) {
                 console.log(err);
             }
-            console.log(result.recordset);
             maxh = result.recordset[0].maxh;
             maxv = result.recordset[0].maxv;
             data = {
@@ -198,7 +200,6 @@ server.post("/tank_history", checkLogin, (req, res) => {
         from_date,
         to_date
     } = req.body;
-    console.log(tankno, from_date, to_date);
     sql.connect({
         ...sql_config,
         database: config.sql_config.database
@@ -211,7 +212,6 @@ server.post("/tank_history", checkLogin, (req, res) => {
             if (err) {
                 console.log(err);
             }
-            console.log(result.recordset);
             // format "storedate" to "YYYY-MM-DD HH:mm:ss"
             for (i = 0; i < result.recordset.length; i++) {
                 result.recordset[i].storedate = moment(result.recordset[i].storedate).format('YYYY-MM-DD HH:mm:ss');
@@ -235,7 +235,6 @@ server.post('/product_history', checkLogin, (req, res) => {
         from_date,
         to_date
     } = req.body;
-    console.log(idproduct, from_date, to_date);
     sql.connect({
         ...sql_config,
         database: config.sql_config.database
@@ -263,7 +262,12 @@ server.post('/product_history', checkLogin, (req, res) => {
 });
 
 server.get('/configurations', checkLogin, (req, res) => {
-    res.sendFile(path.join(publicPath, 'pages', 'configurations.html'));
+    // check user is admin or not
+    if (req.session.role == 'admin') {
+        res.sendFile(path.join(publicPath, 'pages', 'configurations.html'));
+    } else {
+        res.redirect('/');
+    }
 });
 
 server.get('/configurations/get', checkLogin, (req, res) => {
