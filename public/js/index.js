@@ -212,58 +212,17 @@ function view_detail(row_index) {
 
 }
 
-// Connect to the WebSocket server
-const server_address = 'ws://' + document.domain + ':' + '8081';
-const ws = new WebSocket(server_address);
 
-ws.onopen = function () {
-    console.log('Connected to WebSocket server');
-};
+const socket = io.connect('http://' + document.domain + ':' + location.port);
 
-ws.onmessage = function (event) {
-    const temp = JSON.parse(event.data);
-    overiew_data = temp.tankdata;
+socket.on('data', function (data) {
+    overiew_data = data.tankdata;
     // update data
     update_data_table();
     // update table
     update_total_value();
-};
-// get data from /data  when page is loaded
-// window.onload = function () {
-//     fetch('/config')
-//         .then(response => response.json())
-//         .then(data => {
-//             console.log(data);
-//         });
-// };
+});
 
-// document.addEventListener('DOMContentLoaded', () => {
-//     var server_address = 'http://' +document.domain + ':' +location.port;
-
-//     var socket = io.connect(server_address);
-
-//     socket.on('connect', () => {
-//         console.log("connect");
-//     }
-//     );
-
-//     socket.on('disconnect', () => {
-//         console.log("disconnect");
-//     }
-//     );
-
-//     socket.on('mqtt_message', (data) => {
-
-//         temp = JSON.parse(data);
-//         overiew_data = temp.tankdata;
-//         // update data
-//         update_data_table();
-//         // update table
-//         update_total_value();
-//     }
-//     );
-
-// });
 
 // when page load
 document.addEventListener('DOMContentLoaded', () => {

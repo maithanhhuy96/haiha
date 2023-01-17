@@ -9,6 +9,8 @@ const sql = require('mssql/msnodesqlv8');
 const moment = require('moment');
 const config = require('./config');
 const server = express();
+const app = require('http').createServer(server);
+const io = require('socket.io')(app);
 server.use(session({
     secret: 'secret',
     resave: true,
@@ -18,7 +20,7 @@ server.use(session({
 server.use(bodyParser.json());
 
 // server config
-const port = 5000;
+const port = 4000;
 
 // sql config
 const sql_config = {
@@ -54,26 +56,15 @@ mqtt_client.on('disconnect', () => {
 
 // recieve message and send to ws
 mqtt_client.on('message', (topic, message) => {
-    wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(message.toString());
-        }
-    });
+    const data = JSON.parse(message);
+    io.emit('data', data);
 });
 
 // ws config
-const wss = new WebSocket.Server({
-    port: 8081
-});
-wss.on('connection', (ws) => {
-    console.log('WebSocket client connected');
-});
-wss.on('connection', (ws) => {
+io.on('connection', (socket) => {
     console.log('WS connected');
-    ws.on('message', (message) => {
-        console.log('WS message received');
-        console.log(message);
-        mqtt_client.publish('test', message);
+    socket.on('disconnect', () => {
+        console.log('WS disconnected');
     });
 });
 
@@ -327,6 +318,6 @@ server.post('/configurations/update', checkLogin, (req, res) => {
 });
 
 
-server.listen(port, () => {
+app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
