@@ -181,7 +181,9 @@ server.post('/get_max', checkLogin, (req, res) => {
                 }
             }
             res.send(data);
+            sql.close();
         });
+
     });
 });
 
@@ -199,7 +201,7 @@ server.post("/tank_history", checkLogin, (req, res) => {
             console.log(err);
         }
         const request = new sql.Request();
-        request.query(`SELECT * FROM ${sql_table.table_tank} WHERE tankno = ${tankno} AND storedate >= '${from_date}' AND storedate <= '${to_date}' ORDER BY storedate DESC`, (err, result) => {
+        request.query(`SELECT * FROM tabletankhis WHERE tankno = ${tankno} AND storedate >= '${from_date}' AND storedate <= '${to_date}' ORDER BY storedate DESC`, (err, result) => {
             if (err) {
                 console.log(err);
             }
@@ -213,6 +215,7 @@ server.post("/tank_history", checkLogin, (req, res) => {
                 'data': result.recordset
             }
             res.send(data);
+            sql.close();
         });
     });
 });
@@ -234,12 +237,13 @@ server.post('/product_history', checkLogin, (req, res) => {
         if (err) {
             console.log(err);
         }
+        console.log('Connected to database: ' + sql_config.database);
         const request = new sql.Request();
         request.query(`SELECT * FROM ${sql_table.table_product} WHERE idproduct = ${idproduct} AND storedate >= '${from_date}' AND storedate <= '${to_date}' ORDER BY storedate DESC`, (err, result) => {
             if (err) {
                 console.log(err);
             }
-            console.log(result.recordset);
+            console.log(result);
             // format "storedate" to "YYYY-MM-DD HH:mm:ss"
             for (i = 0; i < result.recordset.length; i++) {
                 result.recordset[i].storedate = moment(result.recordset[i].storedate).format('YYYY-MM-DD HH:mm:ss');
@@ -249,6 +253,7 @@ server.post('/product_history', checkLogin, (req, res) => {
                 'data': result.recordset
             }
             res.send(data);
+            sql.close();
         });
     });
 });
@@ -270,12 +275,14 @@ server.get('/configurations/get', checkLogin, (req, res) => {
         if (err) {
             console.log(err);
         }
+
         const request = new sql.Request();
         request.query(`SELECT * FROM tankdata ORDER BY tankid`, (err, result) => {
             if (err) {
                 console.log(err);
             }
-            console.log(result.recordset);
+            console.log('Connected to database: ' + sql_config.database);
+            console.log(result);
             tank_data = [];
             for (i = 0; i < result.recordset.length; i++) {
                 if (result.recordset[i].tankid) {
@@ -287,6 +294,7 @@ server.get('/configurations/get', checkLogin, (req, res) => {
                 'data': result.recordset
             }
             res.send(data);
+            sql.close();
         });
     });
 });
@@ -312,7 +320,9 @@ server.post('/configurations/update', checkLogin, (req, res) => {
             res.send({
                 'status': 'success',
             });
+            sql.close();
         });
+
 
     });
 });
